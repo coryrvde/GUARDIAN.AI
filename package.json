@@ -1,0 +1,29 @@
+{
+  "name": "parental-control-app",
+  "version": "1.0.0",
+  "description": "AI-powered parental control app for WhatsApp monitoring",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:ai": "cd ai-filter && python -m uvicorn main:app --reload --port 8001",
+    "dev:dashboard": "cd web-dashboard && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../ai-filter && pip install -r requirements.txt && cd ../web-dashboard && npm install && cd ../mobile-app && npm install",
+    "build:all": "cd backend && npm run build && cd ../web-dashboard && npm run build && cd ../mobile-app && npm run build"
+  },
+  "keywords": [
+    "parental-control",
+    "ai",
+    "whatsapp",
+    "monitoring"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "workspaces": [
+    "backend",
+    "web-dashboard",
+    "mobile-app"
+  ],
+  "dependencies": {
+    "typescript": "^5.1.3",
+    "@types/react": "~18.2.14"
+  }
+}
