@@ -7,6 +7,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import { supabase } from './app/supabase';
 
 import OnboardingScreen from './app/screens/OnboardingScreen';
 import LoginScreen from './app/screens/LoginScreen';

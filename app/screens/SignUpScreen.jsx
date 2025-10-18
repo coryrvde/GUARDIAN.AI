@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { supabase } from '../supabase';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignUpScreen() {
   const [fullName, setFullName] = useState('');
@@ -9,14 +11,48 @@ export default function SignUpScreen() {
   const [repeatPassword, setRepeatPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const navigation = useNavigation();
 
-  const handleSignUp = () => {
-    if (password !== repeatPassword) {
-      alert('Passwords do not match!');
+  const handleSignUp = async () => {
+    if (!fullName || !email || !password || !repeatPassword) {
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
-    console.log('Sign up with:', { fullName, email, password });
-    alert('Shield Deployed! Account created successfully.');
+
+    if (password !== repeatPassword) {
+      Alert.alert('Error', 'Passwords do not match!');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            full_name: fullName,
+          }
+        }
+      });
+
+      if (error) {
+        Alert.alert('Sign Up Failed', error.message);
+        return;
+      }
+
+      if (data.user) {
+        Alert.alert('Success', 'Account created successfully! Please check your email to verify your account.');
+        navigation.navigate('Login');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+      console.error(error);
+    }
   };
 
   return (

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { supabase } from '../supabase';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -10,15 +11,53 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    console.log('Login with:', { email, password, rememberMe });
-    alert('SLogin successful.');
-    navigation.navigate('Home')
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        Alert.alert('Login Failed', error.message);
+        return;
+      }
+
+      if (data.user) {
+        Alert.alert('Success', 'Login successful!');
+        navigation.navigate('Home');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+      console.error(error);
+    }
   };
 
-  const handleRecoverPassword = () => {
-    console.log('Recover password for:', email);
-    alert('Password recovery link sent to your email.');
+  const handleRecoverPassword = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address first');
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'yourapp://reset-password',
+      });
+
+      if (error) {
+        Alert.alert('Error', error.message);
+      } else {
+        Alert.alert('Success', 'Password recovery link sent to your email.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+      console.error(error);
+    }
   };
 
   return (
